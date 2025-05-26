@@ -1,4 +1,3 @@
-// Student.h
 #ifndef STUDENT_H
 #define STUDENT_H
 
@@ -17,6 +16,8 @@ public:
     void changePassword(MyString oldPassm, MyString newPass);
 
     MyString serialize() const ;
+    void sendMessage(size_t u32recipientId, const MyString& c_message);
+    void viewMailbox() const;
 };
 
 #endif // STUDENT_H

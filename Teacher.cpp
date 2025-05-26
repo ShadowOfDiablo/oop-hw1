@@ -1,4 +1,3 @@
-// Teacher.cpp
 #include "Teacher.h"
 #include "Course.h"
 #include <cstring>
@@ -60,3 +59,12 @@ Course* Teacher::getCourse(const MyString& p_courseName) const {
     }
     return nullptr;
 }
+
+void Teacher::sendMessage(size_t u32recipientId, MyString message) {
+    User::sendMessage(u32recipientId, message);
+}
+
+void Teacher::viewMailbox() const {
+    User::viewMailbox();
+}
+

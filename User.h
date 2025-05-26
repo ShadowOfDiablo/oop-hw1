@@ -1,11 +1,10 @@
-// User.h
 #ifndef USER_H
 #define USER_H
 
 #include "MyString.h"
 #include "Vector.hpp"
 #include "Map.hpp"
-
+#include "CourseManagementSystem.hpp"
 enum UserRole {
     ADMIN,
     TEACHER,
@@ -13,9 +12,7 @@ enum UserRole {
     UNKNOWN_ROLE
 };
 
-size_t myStringToInt(const MyString& p_myString);
-MyString intToMyString(size_t u32value);
-Vector<MyString> splitMyString(const MyString& p_myString, char u8_delimiter);
+class CourseManagementSystem;
 
 class User {
 protected:
@@ -23,14 +20,13 @@ protected:
     MyString c_lastName;
     size_t u32id;
     MyString c_password;
-    UserRole e_role;
-    Vector<MyString> c_inbox;
+    UserRole e_role = UNKNOWN_ROLE;
+    Map<size_t, Vector<std::pair<MyString, time_t>>> inbox;
     Map<MyString, Vector<MyString>> courses;
 
 public:
     User(const MyString& p_firstName, const MyString& p_lastName, size_t u32inputID, const MyString& p_password, UserRole e_inputRole);
     User(const MyString& p_dataLine);
-
     virtual ~User() {}
 
     MyString getFirstName() const;
@@ -38,11 +34,13 @@ public:
     size_t getId() const;
     MyString getPassword() const;
     UserRole getRole() const;
+
     virtual void changePassword(MyString oldPassm, MyString newPass) {};
     void setPassword(const MyString& p_newPassword);
 
-    void addMessage(const MyString& p_message);
-    void viewInbox() const;
+    void sendMessage(size_t u32recipientId, const MyString& c_message);
+
+    void viewMailbox() const;
 
     MyString serialize() const;
 };

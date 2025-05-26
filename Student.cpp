@@ -1,4 +1,3 @@
-// Student.cpp
 #include "Student.h"
 #include <cstring>
 #include <iostream>
@@ -18,7 +17,7 @@ void Student::enrollInCourse(const MyString& p_courseName) {
 
 void Student::submitAssignment(const MyString& p_courseName, const MyString& p_assignmentName) {
     if (courses.contains(p_courseName)) {
-        courses[p_courseName].push_back(p_assignmentName + ":Pending");
+        courses[p_courseName].push_back(p_assignmentName + MyString(":Pending"));
         std::cout << "Assignment " << p_assignmentName << " submitted for course " << p_courseName << std::endl;
     }
     else {
@@ -57,4 +56,12 @@ void Student::changePassword(MyString oldPassm, MyString newPass)
 MyString Student::serialize() const {
     MyString serialized_data = User::serialize();
     return serialized_data;
+}
+
+void Student::sendMessage(size_t u32recipientId, const MyString& c_message) {
+    User::sendMessage(u32recipientId,c_message);
+}
+
+void Student::viewMailbox() const {
+    User::viewMailbox();
 }

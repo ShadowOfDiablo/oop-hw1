@@ -1,4 +1,3 @@
-// Admin.cpp
 #include "Admin.h"
 #include <cstring>
 
@@ -28,4 +27,12 @@ void Admin::changePassword(MyString oldPassm, MyString newPass)
 
 MyString Admin::serialize() const {
     return User::serialize();
+}
+
+void Admin::sendMessage(size_t u32recipientId, MyString message) {
+    User::sendMessage(u32recipientId, message);
+}
+
+void Admin::viewMailbox() const {
+    User::viewMailbox();
 }

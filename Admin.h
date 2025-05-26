@@ -1,4 +1,3 @@
-// Admin.h
 #ifndef ADMIN_H
 #define ADMIN_H
 
@@ -19,6 +18,11 @@ public:
     void changePassword(MyString oldPassm, MyString newPass);
 
     MyString serialize() const;
+
+    void sendMessage(size_t u32recipientId, MyString message);
+
+    void viewMailbox() const;
+
 };
 
 #endif // ADMIN_H

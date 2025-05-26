@@ -1,4 +1,3 @@
-// Teacher.h
 #ifndef TEACHER_H
 #define TEACHER_H
 
@@ -27,6 +26,11 @@ public:
     MyString serialize() const;
 
     Course* getCourse(const MyString& p_courseName) const;
+
+    void sendMessage(size_t u32recipientId, MyString message);
+
+    void viewMailbox() const;
+
 
 };
 

@@ -1,5 +1,5 @@
-// Vector.hpp
-#pragma once
+#ifndef __VECTOR_HPP__
+#define __VECTOR_HPP__
 
 template <typename T>
 class Vector {
@@ -91,3 +91,4 @@ public:
         return u32size == 0U;
     }
 };
+#endif // !__VECTOR_HPP__

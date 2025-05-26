@@ -1,6 +1,5 @@
-// Course.cpp
 #define _CRT_SECURE_NO_WARNINGS
-
+#include "CourseManagementSystem.hpp"
 #include "Course.h"
 #include "User.h"
 #include <iostream>
@@ -11,7 +10,7 @@ Course::Course(const MyString& p_courseName, const MyString& p_password)
 }
 
 Course::Course(const MyString& p_dataLine) {
-    Vector<MyString> c_parts = splitMyString(p_dataLine, ',');
+    Vector<MyString> c_parts = CourseManagementSystem::splitMyString(p_dataLine, ',');
     if (c_parts.getSize() >= 3U) {
         m_courseName = c_parts[0U];
         m_password = c_parts[1U];
@@ -32,7 +31,7 @@ Course::Course(const MyString& p_dataLine) {
                 char* p_char_token = strtok(p_char_start_brace, ",");
                 while (p_char_token != nullptr) {
                     if (strlen(p_char_token) > 0U) {
-                        m_enrolledStudentIDs.push_back(myStringToInt(MyString(p_char_token)));
+                        m_enrolledStudentIDs.push_back(CourseManagementSystem::myStringToInt(MyString(p_char_token)));
                     }
                     p_char_token = strtok(nullptr, ",");
                 }
@@ -69,7 +68,7 @@ MyString Course::serialize() const {
     c_serialized_data += m_password;
     c_serialized_data += ",{";
     for (size_t u32_idx = 0U; u32_idx < m_enrolledStudentIDs.getSize(); ++u32_idx) {
-        c_serialized_data += intToMyString(m_enrolledStudentIDs[u32_idx]);
+        c_serialized_data += CourseManagementSystem::intToMyString(m_enrolledStudentIDs[u32_idx]);
         if (u32_idx < (m_enrolledStudentIDs.getSize() - 1U)) {
             c_serialized_data += ",";
         }
