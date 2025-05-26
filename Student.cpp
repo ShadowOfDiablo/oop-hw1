@@ -1,3 +1,4 @@
+// Student.cpp
 #include "Student.h"
 #include <cstring>
 #include <iostream>
@@ -43,6 +44,14 @@ void Student::viewGrades() const {
         }
     }
     std::cout << "-----------------------" << std::endl;
+}
+
+void Student::changePassword(MyString oldPassm, MyString newPass)
+{
+    if (oldPassm == getPassword())
+    {
+        setPassword(newPass);
+    }
 }
 
 MyString Student::serialize() const {

@@ -1,3 +1,4 @@
+// Teacher.h
 #ifndef TEACHER_H
 #define TEACHER_H
 
@@ -21,7 +22,9 @@ public:
 
     bool addToCourse(const MyString& p_courseName, size_t u32studentID);
 
-    MyString serialize() const override;
+    void changePassword(MyString oldPassm, MyString newPass);
+
+    MyString serialize() const;
 
     Course* getCourse(const MyString& p_courseName) const;
 

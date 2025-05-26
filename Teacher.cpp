@@ -1,3 +1,4 @@
+// Teacher.cpp
 #include "Teacher.h"
 #include "Course.h"
 #include <cstring>
@@ -38,6 +39,14 @@ bool Teacher::addToCourse(const MyString& p_courseName, size_t u32studentID) {
     }
     std::cout << "Course " << p_courseName << " not found or not taught by this teacher." << std::endl;
     return false;
+}
+
+void Teacher::changePassword(MyString oldPassm, MyString newPass)
+{
+    if (oldPassm == getPassword())
+    {
+        setPassword(newPass);
+    }
 }
 
 MyString Teacher::serialize() const {

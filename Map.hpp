@@ -1,5 +1,7 @@
+// Map.hpp
 #pragma once
 #include "Vector.hpp"
+
 template <typename K, typename V>
 struct Pair {
     K key;
@@ -8,10 +10,9 @@ struct Pair {
 template <typename K, typename V>
 
 class Map {
-private:
-    Vector<Pair<K, V>> data;
 
 public:
+    Vector<Pair<K, V>> data;
     void insert(const K& p_key, const V& p_value) {
         for (size_t u32_idx = 0U; u32_idx < data.getSize(); ++u32_idx) {
             if (data[u32_idx].key == p_key) {
@@ -41,6 +42,14 @@ public:
         }
         data.push_back({ p_key, V() });
         return data[data.getSize() - 1U].value;
+    }
+    const V& operator[](const K& p_key) const {
+        for (size_t u32_idx = 0U; u32_idx < data.getSize(); ++u32_idx) {
+            if (data[u32_idx].key == p_key) {
+                return data[u32_idx].value;
+            }
+        }
+        throw std::out_of_range("Key not found");
     }
 
     size_t getSize() const { return data.getSize(); }

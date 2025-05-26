@@ -1,7 +1,9 @@
+// main.cpp
 #define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <fstream>
-#include <limits>
+//#include <limits>
 #include "MyString.h"
 #include "User.h"
 #include "Admin.h"
@@ -13,10 +15,10 @@
 
 Vector<User*> g_users;
 Vector<Course*> g_courses;
-size_t g_u32_next_user_id = 1000U;
+size_t g_u32_next_user_id = 100U;
 
-const size_t K_ADMIN_ID = 1000U;
-const size_t K_INITIAL_USER_ID = 1001U;
+const size_t K_ADMIN_ID = 0U;
+const size_t K_INITIAL_USER_ID = 100U;
 
 User* g_p_logged_in_user = nullptr;
 
@@ -65,7 +67,7 @@ void loadUsers() {
     }
     else {
         std::cout << "No users.txt found, starting with default admin." << std::endl;
-        Admin* p_admin = new Admin("admin", "admin", K_ADMIN_ID, "adminpass");
+        Admin* p_admin = new Admin("admin", "admin", K_ADMIN_ID, "0000");
         g_users.push_back(p_admin);
         g_u32_next_user_id = K_INITIAL_USER_ID;
     }
@@ -113,10 +115,10 @@ User* findUserById(size_t u32id) {
     return p_found_user;
 }
 
-User* findUserByUsernameAndPassword(const MyString& p_username, const MyString& p_password) {
+User* findUserByIdAndPassword(size_t u32id, const MyString& p_password) {
     User* p_found_user = nullptr;
     for (size_t u32_idx = 0U; u32_idx < g_users.getSize(); ++u32_idx) {
-        if (g_users[u32_idx]->getFirstName() == p_username && g_users[u32_idx]->getPassword() == p_password) {
+        if (g_users[u32_idx]->getId() == u32id && g_users[u32_idx]->getPassword() == p_password) {
             p_found_user = g_users[u32_idx];
             break;
         }
@@ -134,6 +136,18 @@ Course* findCourseByName(const MyString& p_courseName) {
     }
     return p_found_course;
 }
+size_t myStringToSizeT(const MyString& str) {
+    size_t result = 0;
+    for (int i = 0; i < str.length(); ++i) {
+        if (isdigit(str[i])) {
+            result = result * 10U + static_cast<size_t>(str[i] - '0');
+        }
+        else {
+            throw std::invalid_argument("Invalid ID: MyString contains non-numeric characters.");
+        }
+    }
+    return result;
+}
 
 void processCommand(const MyString& p_command_line) {
     Vector<MyString> c_tokens = splitMyString(p_command_line, ' ');
@@ -142,12 +156,11 @@ void processCommand(const MyString& p_command_line) {
     }
 
     MyString c_command = c_tokens[0U];
-
     if (c_command == "login") {
         if (c_tokens.getSize() == 3U) {
-            MyString c_username = c_tokens[1U];
+            size_t c_id = myStringToSizeT(c_tokens[1U]);
             MyString c_password = c_tokens[2U];
-            g_p_logged_in_user = findUserByUsernameAndPassword(c_username, c_password);
+            g_p_logged_in_user = findUserByIdAndPassword(c_id, c_password);
             if (g_p_logged_in_user != nullptr) {
                 std::cout << "Logged in as " << g_p_logged_in_user->getFirstName() << " (" << intToMyString(g_p_logged_in_user->getId()) << ")" << std::endl;
             }
@@ -166,6 +179,13 @@ void processCommand(const MyString& p_command_line) {
         }
         else {
             std::cout << "No user is currently logged in." << std::endl;
+        }
+    }
+    else if (c_command == "change_password" && g_p_logged_in_user != nullptr)
+    {
+        if (g_p_logged_in_user->getRole() == TEACHER || g_p_logged_in_user->getRole() == STUDENT || g_p_logged_in_user->getRole() == ADMIN)
+        {
+            g_p_logged_in_user->changePassword(c_tokens[1U], c_tokens[2U]);
         }
     }
     else if (g_p_logged_in_user == nullptr) {
@@ -257,7 +277,7 @@ void processCommand(const MyString& p_command_line) {
                     std::cout << "Usage: add_to_course <courseName> <studentId>" << std::endl;
                 }
             }
-            else if (c_command == "view_courses_taught") {
+            else if (c_command == "view_courses") {
                 std::cout << "--- Courses Taught by " << p_teacher->getFirstName() << " ---" << std::endl;
                 bool b_found_any_course = false;
                 for (size_t u32_idx = 0U; u32_idx < g_courses.getSize(); ++u32_idx) {

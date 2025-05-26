@@ -1,9 +1,9 @@
 // MyString.cpp
-#define _CRT_SECURE_NO_WARNINGS // To suppress strcpy/strcat/localtime warnings if compiling with MSVC
+#define _CRT_SECURE_NO_WARNINGS
 
 #include "MyString.h"
-#include <iostream> // For std::ostream
-#include <cstring>  // For strlen, strcpy, strcat, strcmp, strstr
+#include <iostream>
+#include <cstring>
 
 MyString::MyString() : data(nullptr), len(0) {
     allocate_and_copy("");
@@ -36,9 +36,9 @@ MyString& MyString::operator=(const MyString& other) {
 
 MyString& MyString::operator+=(const MyString& other) {
     int new_len = len + other.len;
-    char* new_data = new char[new_len + 1];
-    strcpy(new_data, data);
-    strcat(new_data, other.data);
+    char* new_data = new char[static_cast<size_t>(new_len) + 1U];
+    (void)strcpy(new_data, data);
+    (void)strcat(new_data, other.data);
     delete[] data;
     data = new_data;
     len = new_len;
@@ -46,10 +46,11 @@ MyString& MyString::operator+=(const MyString& other) {
 }
 
 char MyString::operator[](int index) const {
-    if (index >= 0 && index < len) {
-        return data[index];
+    char u8_ret_val = '\0';
+    if ((index >= 0) && (index < len)) {
+        u8_ret_val = data[static_cast<size_t>(index)];
     }
-    return '\0';
+    return u8_ret_val;
 }
 
 int MyString::length() const {
@@ -57,27 +58,33 @@ int MyString::length() const {
 }
 
 int MyString::find(const MyString& str) const {
+    int u32_ret_val = -1;
     if (str.length() == 0) {
-        return 0;
+        u32_ret_val = 0;
     }
-    if (len < str.length()) {
-        return -1;
+    else if (len >= str.length()) {
+        const char* found_ptr = strstr(data, str.c_str());
+        if (found_ptr != nullptr) {
+            u32_ret_val = static_cast<int>(found_ptr - data);
+        }
     }
-    const char* found_ptr = strstr(data, str.c_str());
-    if (found_ptr != nullptr) {
-        return found_ptr - data;
-    }
-    return -1;
+    return u32_ret_val;
 }
 
 const char* MyString::c_str() const {
     return data;
 }
 
+MyString operator+(const MyString& lhs, const MyString& rhs) {
+    MyString temp(lhs);
+    temp += rhs;
+    return temp;
+}
+
 void MyString::allocate_and_copy(const char* s) {
-    len = strlen(s);
-    data = new char[len + 1];
-    strcpy(data, s);
+    len = static_cast<int>(strlen(s));
+    data = new char[static_cast<size_t>(len) + 1U];
+    (void)strcpy(data, s);
 }
 
 std::ostream& operator<<(std::ostream& os, const MyString& s) {
@@ -86,19 +93,25 @@ std::ostream& operator<<(std::ostream& os, const MyString& s) {
 }
 
 bool operator==(const MyString& lhs, const MyString& rhs) {
-    return (lhs.length() == rhs.length()) && (strcmp(lhs.c_str(), rhs.c_str()) == 0);
+    return strcmp(lhs.c_str(), rhs.c_str()) == 0;
 }
 
 bool operator!=(const MyString& lhs, const MyString& rhs) {
     return !(lhs == rhs);
 }
 
-MyString operator+(const MyString& lhs, const MyString& rhs) {
-    int new_len = lhs.length() + rhs.length();
-    char* new_data = new char[new_len + 1];
-    strcpy(new_data, lhs.c_str());
-    strcat(new_data, rhs.c_str());
-    MyString result(new_data);
-    delete[] new_data;
-    return result;
+bool operator<(const MyString& lhs, const MyString& rhs) {
+    return strcmp(lhs.c_str(), rhs.c_str()) < 0;
+}
+
+bool operator>(const MyString& lhs, const MyString& rhs) {
+    return strcmp(lhs.c_str(), rhs.c_str()) > 0;
+}
+
+bool operator<=(const MyString& lhs, const MyString& rhs) {
+    return !(lhs > rhs);
+}
+
+bool operator>=(const MyString& lhs, const MyString& rhs) {
+    return !(lhs < rhs);
 }

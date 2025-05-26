@@ -1,3 +1,4 @@
+// Student.h
 #ifndef STUDENT_H
 #define STUDENT_H
 
@@ -13,7 +14,9 @@ public:
     void submitAssignment(const MyString& p_courseName, const MyString& p_assignmentName);
     void viewGrades() const;
 
-    MyString serialize() const override;
+    void changePassword(MyString oldPassm, MyString newPass);
+
+    MyString serialize() const ;
 };
 
 #endif // STUDENT_H

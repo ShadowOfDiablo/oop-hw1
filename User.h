@@ -1,3 +1,4 @@
+// User.h
 #ifndef USER_H
 #define USER_H
 
@@ -37,7 +38,7 @@ public:
     size_t getId() const;
     MyString getPassword() const;
     UserRole getRole() const;
-
+    virtual void changePassword(MyString oldPassm, MyString newPass) {};
     void setPassword(const MyString& p_newPassword);
 
     void addMessage(const MyString& p_message);

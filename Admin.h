@@ -1,5 +1,7 @@
+// Admin.h
 #ifndef ADMIN_H
 #define ADMIN_H
+
 #include "User.h"
 #include "Teacher.h"
 #include "Student.h"
@@ -14,7 +16,9 @@ public:
 
     Student* addStudent(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password);
 
-    MyString serialize() const override;
+    void changePassword(MyString oldPassm, MyString newPass);
+
+    MyString serialize() const;
 };
 
 #endif // ADMIN_H

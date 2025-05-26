@@ -1,4 +1,6 @@
+// Vector.hpp
 #pragma once
+
 template <typename T>
 class Vector {
     T* p_data = nullptr;
