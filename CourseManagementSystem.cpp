@@ -96,11 +96,11 @@ void CourseManagementSystem::loadUsers() {
         c_user_file.close();
     }
     else {
-        std::cout << "No users.txt found." << std::endl;
+        std::cout << "No users.txt found.\n" << std::endl;
     }
 
     if (g_users.isEmpty()) {
-        std::cout << "No valid users loaded. Starting with default admin." << std::endl;
+        std::cout << "No valid users loaded. Starting with default admin.\n" << std::endl;
         Admin* p_admin = new Admin("admin", "admin", K_ADMIN_ID, "0000");
         g_users.push_back(p_admin);
         g_u32_next_user_id = K_INITIAL_USER_ID;
@@ -172,7 +172,7 @@ size_t CourseManagementSystem::myStringToSizeT(const MyString& str) {
             result = result * 10U + static_cast<size_t>(str[i] - '0');
         }
         else {
-            throw std::invalid_argument("Invalid ID: MyString contains non-numeric characters.");
+            throw std::invalid_argument("Invalid ID: MyString contains non-numeric characters.\n");
         }
     }
     return result;
@@ -187,9 +187,13 @@ void CourseManagementSystem::processCommand(const MyString& p_command_line) {
     MyString command = MyString::trim(c_tokens[0]);
 
     std::cout << command;
+	if (command == "logout") {
+		g_p_logged_in_user = nullptr;
+		return;
+	}
     if (command == "login") {
         if (c_tokens.getSize() != 3U) {
-            std::cout << "Usage: login <id> <password>" << std::endl;
+            std::cout << "Usage: login <id> <password>\n" << std::endl;
             return;
         }
         size_t id = myStringToInt(MyString::trim(c_tokens[1]));
@@ -198,17 +202,17 @@ void CourseManagementSystem::processCommand(const MyString& p_command_line) {
         User* user = findUserByIdAndPassword(id, password);
         if (user != nullptr) {
             g_p_logged_in_user = user;
-            std::cout << "Login successful! Welcome, "
+            std::cout << "Login successful! Welcome, \n"
                 << user->getFirstName() << "!" << std::endl;
         }
         else {
-            std::cout << "Login failed. Incorrect id or password." << std::endl;
+            std::cout << "Login failed. Incorrect id or password.\n" << std::endl;
         }
         return;
     }
 
     if (g_p_logged_in_user == nullptr) {
-        std::cout << "Please login first." << std::endl;
+        std::cout << "Please login first.\n" << std::endl;
         return;
     }
 
@@ -223,7 +227,7 @@ void CourseManagementSystem::processCommand(const MyString& p_command_line) {
         handleStudentCommands(c_tokens);
         break;
     default:
-        std::cout << "Invalid role." << std::endl;
+        std::cout << "Invalid role.\n" << std::endl;
         break;
     }
 }
@@ -242,7 +246,8 @@ void CourseManagementSystem::handleAdminCommands(const Vector<MyString>& c_token
 
             Teacher* p_new_teacher = p_admin->addTeacher(c_first_name, c_last_name, g_u32_next_user_id++, c_password);
             g_users.push_back(p_new_teacher);
-            std::cout << "Teacher " << p_new_teacher->getFirstName() << " added with ID " << intToMyString(p_new_teacher->getId()) << std::endl;
+            std::cout << "Teacher " << p_new_teacher->getFirstName()
+                << " added with ID " << intToMyString(p_new_teacher->getId()) << std::endl;
         }
         else {
             std::cout << "Usage: add_teacher <firstName> <lastName> <password>" << std::endl;
@@ -256,29 +261,61 @@ void CourseManagementSystem::handleAdminCommands(const Vector<MyString>& c_token
 
             Student* p_new_student = p_admin->addStudent(c_first_name, c_last_name, g_u32_next_user_id++, c_password);
             g_users.push_back(p_new_student);
-            std::cout << "Student " << p_new_student->getFirstName() << " added with ID " << intToMyString(p_new_student->getId()) << std::endl;
+            std::cout << "Student " << p_new_student->getFirstName()
+                << " added with ID " << intToMyString(p_new_student->getId()) << std::endl;
         }
         else {
             std::cout << "Usage: add_student <firstName> <lastName> <password>" << std::endl;
+        }
+    }
+    else if (c_command == "change_password") {
+        if (c_tokens.getSize() == 3U) {
+            p_admin->changePassword(c_tokens[1U], c_tokens[2U]);
+        }
+        else {
+            std::cout << "Usage: change_password <oldPassword> <newPassword>" << std::endl;
+        }
+    }
+    else if (c_command == "message") {
+        if (c_tokens.getSize() >= 3U) {
+            size_t u32_recipient_id = myStringToSizeT(c_tokens[1U]);
+            MyString c_message = "";
+            for (size_t u32_idx = 2U; u32_idx < c_tokens.getSize(); ++u32_idx) {
+                c_message += c_tokens[u32_idx];
+                if (u32_idx < c_tokens.getSize() - 1U) {
+                    c_message += MyString(" ");  // Fixed concatenation: use += instead of +
+                }
+            }
+            p_admin->sendMessage(u32_recipient_id, c_message);
+        }
+        else {
+            std::cout << "Usage: send_message <recipientId> <message>" << std::endl;
         }
     }
     else if (c_command == "view_users") {
         std::cout << "--- All Users ---" << std::endl;
         for (size_t u32_idx = 0U; u32_idx < g_users.getSize(); ++u32_idx) {
             std::cout << "ID: " << intToMyString(g_users[u32_idx]->getId())
-                << ", Name: " << g_users[u32_idx]->getFirstName() << " " << g_users[u32_idx]->getLastName()
-                << ", Role: ";
-            if (g_users[u32_idx]->getRole() == ADMIN) std::cout << "Admin";
-            else if (g_users[u32_idx]->getRole() == TEACHER) std::cout << "Teacher";
-            else if (g_users[u32_idx]->getRole() == STUDENT) std::cout << "Student";
+                << ", Name: " << g_users[u32_idx]->getFirstName() << " "
+                << g_users[u32_idx]->getLastName() << ", Role: ";
+            if (g_users[u32_idx]->getRole() == ADMIN)
+                std::cout << "Admin";
+            else if (g_users[u32_idx]->getRole() == TEACHER)
+                std::cout << "Teacher";
+            else if (g_users[u32_idx]->getRole() == STUDENT)
+                std::cout << "Student";
             std::cout << std::endl;
         }
         std::cout << "-----------------" << std::endl;
+    }
+    else if (c_command == "mailbox") {
+        p_admin->viewMailbox();
     }
     else {
         std::cout << "Unknown admin command." << std::endl;
     }
 }
+
 void CourseManagementSystem::handleTeacherCommands(const Vector<MyString>& c_tokens) {
     MyString c_command = c_tokens[0U];
     Teacher* p_teacher = static_cast<Teacher*>(g_p_logged_in_user);
@@ -291,11 +328,20 @@ void CourseManagementSystem::handleTeacherCommands(const Vector<MyString>& c_tok
             Course* p_new_course = p_teacher->createCourse(c_course_name, c_course_password);
             if (p_new_course != nullptr) {
                 g_courses.push_back(p_new_course);
-                std::cout << "Course '" << c_course_name << "' created by teacher " << p_teacher->getFirstName() << std::endl;
+                std::cout << "Course '" << c_course_name
+                    << "' created by teacher " << p_teacher->getFirstName() << std::endl;
             }
         }
         else {
             std::cout << "Usage: create_course <courseName> <coursePassword>" << std::endl;
+        }
+    }
+    else if (c_command == "change_password") {
+        if (c_tokens.getSize() == 3U) {
+            p_teacher->changePassword(c_tokens[1U], c_tokens[2U]);
+        }
+        else {
+            std::cout << "Usage: change_password <oldPassword> <newPassword>" << std::endl;
         }
     }
     else if (c_command == "assign_homework") {
@@ -316,7 +362,6 @@ void CourseManagementSystem::handleTeacherCommands(const Vector<MyString>& c_tok
                         c_homework.insert(c_task_grade[0U], grade_str);
                     }
                 }
-
                 std::cout << "Homework assigned for course " << c_course_name << std::endl;
             }
             else {
@@ -326,6 +371,25 @@ void CourseManagementSystem::handleTeacherCommands(const Vector<MyString>& c_tok
         else {
             std::cout << "Usage: assign_homework <courseName> <Task1:grade,Task2:grade,...>" << std::endl;
         }
+    }
+    else if (c_command == "message") {
+        if (c_tokens.getSize() >= 3U) {
+            size_t u32_recipient_id = myStringToSizeT(c_tokens[1U]);
+            MyString c_message = "";
+            for (size_t u32_idx = 2U; u32_idx < c_tokens.getSize(); ++u32_idx) {
+                c_message += c_tokens[u32_idx];
+                if (u32_idx < c_tokens.getSize() - 1U) {
+                    c_message += MyString(" ");  // Fixed concatenation: use += here
+                }
+            }
+            p_teacher->sendMessage(u32_recipient_id, c_message);
+        }
+        else {
+            std::cout << "Usage: send_message <recipientId> <message>" << std::endl;
+        }
+    }
+    else if (c_command == "mailbox") {
+        p_teacher->viewMailbox();
     }
     else {
         std::cout << "Unknown teacher command." << std::endl;
@@ -353,7 +417,12 @@ void CourseManagementSystem::handleStudentCommands(const Vector<MyString>& c_tok
             std::cout << "Usage: enroll_course <courseName>" << std::endl;
         }
     }
-    else if (c_command == "submit_assignment") {
+    else if (c_command == "change_password") 
+    {
+		p_student->changePassword(c_tokens[1U], c_tokens[2U]);
+    }
+    else if (c_command == "submit_assignment")
+    {
         if (c_tokens.getSize() == 3U) {
             MyString c_course_name = c_tokens[1U];
             MyString c_assignment_name = c_tokens[2U];
@@ -363,10 +432,33 @@ void CourseManagementSystem::handleStudentCommands(const Vector<MyString>& c_tok
             std::cout << "Usage: submit_assignment <courseName> <assignmentName>" << std::endl;
         }
     }
-    else if (c_command == "view_grades") {
+	else if (c_command == "message") {
+		if (c_tokens.getSize() >= 3U) {
+			size_t u32_recipient_id = myStringToSizeT(c_tokens[1U]);
+			MyString c_message = "";
+			for (size_t u32_idx = 2U; u32_idx < c_tokens.getSize(); ++u32_idx)
+			{
+				c_message += c_tokens[u32_idx];
+				if (u32_idx < c_tokens.getSize() - 1U) {
+					c_message += MyString(" ");
+				}
+			}
+			p_student->sendMessage(u32_recipient_id, c_message);
+		}
+		else {
+			std::cout << "Usage: send_message <recipientId> <message>" << std::endl;
+		}
+	}
+	else if (c_command == "mailbox")
+	{
+		p_student->viewMailbox();
+	}
+    else if (c_command == "view_grades")
+    {
         p_student->viewGrades();
     }
-    else {
+    else
+    {
         std::cout << "Unknown student command." << std::endl;
     }
 }

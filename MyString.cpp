@@ -1,6 +1,5 @@
-// MyString.cpp
 #define _CRT_SECURE_NO_WARNINGS
-
+#include "Vector.hpp"
 #include "MyString.h"
 #include <iostream>
 #include <cstring>
@@ -57,6 +56,53 @@ int MyString::length() const {
     return len;
 }
 
+size_t MyString::find(char u8_delimiter, size_t u32_start) const {
+    for (size_t u32_idx = u32_start; u32_idx < static_cast<size_t>(len); ++u32_idx) {
+        if (data[u32_idx] == u8_delimiter) {
+            return u32_idx;
+        }
+    }
+    return npos;
+}
+
+MyString MyString::substr(size_t u32_start, size_t u32_length) const {
+    if (u32_start >= static_cast<size_t>(len)) {
+        return MyString();
+    }
+
+    size_t u32_end;
+    if (u32_length == npos || u32_start + u32_length > static_cast<size_t>(len)) {
+        u32_end = static_cast<size_t>(len);
+    }
+    else {
+        u32_end = u32_start + u32_length;
+    }
+
+    size_t sub_length = u32_end - u32_start;
+    char* buffer = new char[sub_length + 1];
+
+    for (size_t i = 0; i < sub_length; i++) {
+        buffer[i] = data[u32_start + i];
+    }
+    buffer[sub_length] = '\0';
+
+    MyString result(buffer);
+    delete[] buffer;
+    return result;
+}
+
+
+Vector<MyString> MyString::split(const MyString& p_myString, char u8_delimiter) {
+    Vector<MyString> c_parts;
+    size_t u32_start = 0U, u32_end = 0U;
+    while ((u32_end = p_myString.find(u8_delimiter, u32_start)) != MyString::npos) {
+        c_parts.push_back(p_myString.substr(u32_start, u32_end - u32_start));
+        u32_start = u32_end + 1U;
+    }
+    c_parts.push_back(p_myString.substr(u32_start));
+    return c_parts;
+}
+
 int MyString::find(const MyString& str) const {
     int u32_ret_val = -1;
     if (str.length() == 0) {
@@ -69,6 +115,18 @@ int MyString::find(const MyString& str) const {
         }
     }
     return u32_ret_val;
+}
+
+MyString MyString::trim(const MyString& s) {
+    int start = 0;
+    while (start < s.length() && (s[start] == ' ' || s[start] == '\n' || s[start] == '\r'))
+        start++;
+    int end = s.length() - 1;
+    while (end >= 0 && (s[end] == ' ' || s[end] == '\n' || s[end] == '\r'))
+        end--;
+    if (start > end)
+        return MyString("");
+    return s.substr(start, end - start + 1);
 }
 
 const char* MyString::c_str() const {

@@ -5,6 +5,7 @@
 #include "MyString.h"
 
 class Student : public User {
+	
 public:
     Student(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password);
     Student(const MyString& p_dataLine);

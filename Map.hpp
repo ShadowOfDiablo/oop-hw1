@@ -1,4 +1,3 @@
-// Map.hpp
 #pragma once
 #include "Vector.hpp"
 
@@ -53,4 +52,6 @@ public:
     }
 
     size_t getSize() const { return data.getSize(); }
+
+	bool isEmpty() const { return data.isEmpty(); }
 };
