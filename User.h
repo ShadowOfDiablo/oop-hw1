@@ -5,6 +5,8 @@
 #include "Vector.hpp"
 #include "Map.hpp"
 #include "CourseManagementSystem.hpp"
+#include <ctime>
+
 enum UserRole {
     ADMIN,
     TEACHER,
@@ -23,26 +25,21 @@ protected:
     UserRole e_role = UNKNOWN_ROLE;
     Map<size_t, Vector<std::pair<MyString, time_t>>> inbox;
     Map<MyString, Vector<MyString>> courses;
-
 public:
-    User(const MyString& p_firstName, const MyString& p_lastName, size_t u32inputID, const MyString& p_password, UserRole e_inputRole);
-    User(const MyString& p_dataLine);
+    User(const MyString& c_firstName, const MyString& c_lastName, size_t u32id, const MyString& c_password, UserRole e_inputRole);
+    User(const MyString& c_dataLine);
     virtual ~User() {}
-
     MyString getFirstName() const;
     MyString getLastName() const;
     size_t getId() const;
     MyString getPassword() const;
     UserRole getRole() const;
-
-    virtual void changePassword(MyString oldPassm, MyString newPass) {};
-    void setPassword(const MyString& p_newPassword);
-
+    virtual void changePassword(MyString c_oldPassm, MyString c_newPass);
+    void setPassword(const MyString& c_newPassword);
     void sendMessage(size_t u32recipientId, const MyString& c_message);
-
     void viewMailbox() const;
-
-    MyString serialize() const;
+    virtual void clearMailbox();
+    virtual MyString serialize() const;
 };
 
 #endif // USER_H

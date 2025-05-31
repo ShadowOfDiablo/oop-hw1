@@ -33,7 +33,7 @@ public:
     static User* findUserById(size_t u32id);
 
     User* findUserByIdAndPassword(size_t u32id, const MyString& p_password);
-    Course* findCourseByName(const MyString& p_courseName);
+    static Course* findCourseByName(const MyString& p_courseName);
 
     static size_t myStringToSizeT(const MyString& str);
     void processCommand(const MyString& commandLine);
@@ -63,7 +63,6 @@ public:
             u32value /= 10U;
         } while (u32value > 0U);
         u8_buffer[u32_idx] = '\0';
-        // Reverse the string.
         for (size_t i = 0U; i < u32_idx / 2U; ++i) {
             char temp = u8_buffer[i];
             u8_buffer[i] = u8_buffer[u32_idx - 1U - i];
@@ -80,6 +79,9 @@ public:
         }
         c_parts.push_back(p_myString.substr(u32_start));
         return c_parts;
+    }
+    static Vector<User*>& getUsers() {
+        return g_users;
     }
 };
 

@@ -3,34 +3,33 @@
 #include "CourseManagementSystem.hpp"
 #include <iostream>
 #include <ctime>
+#include <cstring>
 
-User::User(const MyString& p_firstName, const MyString& p_lastName,
-    size_t u32inputID, const MyString& p_password, UserRole e_inputRole)
-    : c_firstName(p_firstName), c_lastName(p_lastName),
-    u32id(u32inputID), c_password(p_password), e_role(e_inputRole) {
+User::User(const MyString& c_firstName, const MyString& c_lastName,
+    size_t u32id, const MyString& c_password, UserRole e_inputRole)
+    : c_firstName(c_firstName), c_lastName(c_lastName),
+    u32id(u32id), c_password(c_password), e_role(e_inputRole) {
 }
 
-User::User(const MyString& p_dataLine) {
-    // Use the static splitMyString function.
-    Vector<MyString> c_parts = CourseManagementSystem::splitMyString(p_dataLine, ',');
+User::User(const MyString& c_dataLine) {
+    Vector<MyString> c_parts = CourseManagementSystem::splitMyString(c_dataLine, ',');
     if (c_parts.getSize() >= 5U) {
         c_firstName = c_parts[0U];
         c_lastName = c_parts[1U];
         u32id = CourseManagementSystem::myStringToInt(c_parts[2U]);
         c_password = c_parts[3U];
-
         MyString c_role_str = c_parts[4U];
-        if (c_role_str == "Admin") {
+        if (c_role_str == "Admin")
             e_role = ADMIN;
-        }
-        else if (c_role_str == "Teacher") {
+        else if (c_role_str == "Teacher")
             e_role = TEACHER;
-        }
-        else if (c_role_str == "Student") {
+        else if (c_role_str == "Student")
             e_role = STUDENT;
-        }
-        else {
+        else
             e_role = UNKNOWN_ROLE;
+        if (c_parts.getSize() >= 6U) {
+            MyString c_mailbox = c_parts[5U];
+            if (c_mailbox.length() >= 2);
         }
     }
 }
@@ -55,51 +54,48 @@ UserRole User::getRole() const {
     return e_role;
 }
 
-void User::setPassword(const MyString& p_newPassword) {
-    c_password = p_newPassword;
+void User::setPassword(const MyString& c_newPassword) {
+    c_password = c_newPassword;
 }
 
 void User::sendMessage(size_t u32recipientId, const MyString& c_message) {
     User* p_recipient = CourseManagementSystem::findUserById(u32recipientId);
-
     if (p_recipient != nullptr) {
         time_t u32now = time(nullptr);
-        // Assuming inbox is a map-like container keyed on the sender's id.
         p_recipient->inbox[u32id].push_back({ c_message, u32now });
-        std::cout << "Message sent to " << p_recipient->getFirstName() << "!" << std::endl;
+        std::cout << "Message sent to " << p_recipient->getFirstName().c_str() << "!" << std::endl;
     }
     else {
-        std::cout << "User with ID "
-            << CourseManagementSystem::intToMyString(u32recipientId)
-            << " not found." << std::endl;
+        std::cout << "User with ID " << CourseManagementSystem::intToMyString(u32recipientId).c_str() << " not found." << std::endl;
     }
 }
 
 void User::viewMailbox() const {
-    std::cout << "\n--- Mailbox for " << getFirstName() << " ---\n";
-
+    std::cout << "\n--- Mailbox for " << getFirstName().c_str() << " ---\n";
     if (inbox.isEmpty()) {
         std::cout << "No messages.\n";
         return;
     }
-
-    for (size_t u32idx = 0U; u32idx < inbox.getSize(); ++u32idx) {
-        std::cout << "\n** From "
-            << CourseManagementSystem::intToMyString(inbox.data[u32idx].key)
-            << " **\n";
-
-        for (size_t u32j = 0U; u32j < inbox.data[u32idx].value.getSize(); ++u32j) {
-            time_t u32timestamp = inbox.data[u32idx].value[u32j].second;
-            char u8buffer[26];
+    for (size_t u32_i = 0U; u32_i < inbox.getSize(); ++u32_i) {
+        std::cout << "\n** From " << CourseManagementSystem::intToMyString(inbox.data[u32_i].key).c_str() << " **\n";
+        for (size_t u32_j = 0U; u32_j < inbox.data[u32_i].value.getSize(); ++u32_j) {
+            time_t u32timestamp = inbox.data[u32_i].value[u32_j].second;
+            char c_buffer[26];
             struct tm* p_tm_info = localtime(&u32timestamp);
-            strftime(u8buffer, 26, "%Y-%m-%d %H:%M:%S", p_tm_info);
-
-            std::cout << "  [" << u8buffer << "] "
-                << inbox.data[u32idx].value[u32j].first << "\n";
+            strftime(c_buffer, 26, "%Y-%m-%d %H:%M:%S", p_tm_info);
+            std::cout << "  [" << c_buffer << "] " << inbox.data[u32_i].value[u32_j].first.c_str() << "\n";
         }
     }
-
     std::cout << "------------------------------------\n";
+}
+
+void User::clearMailbox() {
+    inbox.clear();
+}
+
+void User::changePassword(MyString c_oldPassm, MyString c_newPass) {
+    if (c_oldPassm == getPassword())
+        setPassword(c_newPass);
 }
 
 MyString User::serialize() const {
@@ -121,5 +117,16 @@ MyString User::serialize() const {
         c_data += "Unknown";
         break;
     }
+    MyString c_mailbox = "{";
+    for (size_t u32_i = 0U; u32_i < inbox.getSize(); ++u32_i) {
+        const Vector<std::pair<MyString, time_t>>& c_messages = inbox.data[u32_i].value;
+        for (size_t u32_j = 0U; u32_j < c_messages.getSize(); ++u32_j) {
+            c_mailbox += c_messages[u32_j].first;
+            if (!(u32_i == inbox.getSize() - 1 && u32_j == c_messages.getSize() - 1))
+                c_mailbox += ",";
+        }
+    }
+    c_mailbox += "}";
+    c_data += MyString(",") + c_mailbox;
     return c_data;
 }

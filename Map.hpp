@@ -52,6 +52,10 @@ public:
     }
 
     size_t getSize() const { return data.getSize(); }
+    void clear()
+    {
+        data.clear();
 
+    }
 	bool isEmpty() const { return data.isEmpty(); }
 };

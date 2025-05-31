@@ -5,20 +5,18 @@
 #include "MyString.h"
 
 class Student : public User {
-	
 public:
-    Student(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password);
-    Student(const MyString& p_dataLine);
-
-    void enrollInCourse(const MyString& p_courseName);
-    void submitAssignment(const MyString& p_courseName, const MyString& p_assignmentName);
+    Student(const MyString& c_firstName, const MyString& c_lastName, size_t u32_id, const MyString& c_password);
+    Student(const MyString& c_dataLine);
+    void enrollInCourse(const MyString& c_courseName);
+    void submitAssignment(const MyString& p_courseName, const MyString& p_assignmentName, const MyString& c_submissionMessage);
+    void view_assignment_submissions(const MyString& c_assignmentName);
     void viewGrades() const;
-
-    void changePassword(MyString oldPassm, MyString newPass);
-
-    MyString serialize() const ;
-    void sendMessage(size_t u32recipientId, const MyString& c_message);
+    void changePassword(MyString c_oldPassm, MyString c_newPass);
+    MyString serialize() const;
+    void sendMessage(size_t u32_recipientId, const MyString& c_message);
     void viewMailbox() const;
+    void clearMailbox();
 };
 
 #endif // STUDENT_H

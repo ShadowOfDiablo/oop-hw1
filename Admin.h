@@ -2,27 +2,23 @@
 #define ADMIN_H
 
 #include "User.h"
-#include "Teacher.h"
-#include "Student.h"
 #include "MyString.h"
+
+class Teacher;
+class Student;
 
 class Admin : public User {
 public:
-    Admin(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password);
-    Admin(const MyString& p_dataLine);
-
-    Teacher* addTeacher(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password);
-
-    Student* addStudent(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password);
-
-    void changePassword(MyString oldPassm, MyString newPass);
-
+    Admin(const MyString& c_firstName, const MyString& c_lastName, size_t u32_id, const MyString& c_password);
+    Admin(const MyString& c_dataLine);
+    Teacher* addTeacher(const MyString& c_firstName, const MyString& c_lastName, size_t u32_id, const MyString& c_password);
+    Student* addStudent(const MyString& c_firstName, const MyString& c_lastName, size_t u32_id, const MyString& c_password);
+    void changePassword(MyString c_oldPassm, MyString c_newPass);
     MyString serialize() const;
-
-    void sendMessage(size_t u32recipientId, MyString message);
-
+    void sendMessage(size_t u32_recipientId, MyString c_message);
     void viewMailbox() const;
-
+    void message_all(MyString msg);
+    void clearMailbox();
 };
 
 #endif // ADMIN_H

@@ -1,67 +1,103 @@
 #include "Student.h"
-#include <cstring>
+#include "CourseManagementSystem.hpp"
+#include "Course.h"
 #include <iostream>
+#include <cstring>
 
-Student::Student(const MyString& p_firstName, const MyString& p_lastName, size_t u32id, const MyString& p_password)
-    : User(p_firstName, p_lastName, u32id, p_password, STUDENT) {
+Student::Student(const MyString& c_firstName, const MyString& c_lastName, size_t u32_id, const MyString& c_password)
+    : User(c_firstName, c_lastName, u32_id, c_password, STUDENT) {
 }
 
-Student::Student(const MyString& p_dataLine)
-    : User(p_dataLine) {
+Student::Student(const MyString& c_dataLine)
+    : User(c_dataLine) {
 }
 
-void Student::enrollInCourse(const MyString& p_courseName) {
-    courses.insert(p_courseName, Vector<MyString>());
-    std::cout << "Student " << getFirstName() << " enrolled in course " << p_courseName << std::endl;
+void Student::enrollInCourse(const MyString& c_courseName) {
+    courses.insert(c_courseName, Vector<MyString>());
+    std::cout << "Student " << getFirstName().c_str() << " enrolled in course " << c_courseName.c_str() << std::endl;
 }
 
-void Student::submitAssignment(const MyString& p_courseName, const MyString& p_assignmentName) {
-    if (courses.contains(p_courseName)) {
-        courses[p_courseName].push_back(p_assignmentName + MyString(":Pending"));
-        std::cout << "Assignment " << p_assignmentName << " submitted for course " << p_courseName << std::endl;
+void Student::submitAssignment(const MyString& p_courseName, const MyString& p_assignmentName, const MyString& c_submissionMessage) {
+    Course* p_course = CourseManagementSystem::findCourseByName(p_courseName);
+    if (p_course != nullptr)
+        p_course->submitAssignment(getId(), p_assignmentName, c_submissionMessage);
+    else
+        std::cout << "Course " << p_courseName.c_str() << " not found." << std::endl;
+}
+
+void Student::view_assignment_submissions(const MyString& c_assignmentName) {
+    if (courses.isEmpty()) {
+        std::cout << "No courses enrolled." << std::endl;
+        return;
     }
-    else {
-        std::cout << "Not enrolled in course " << p_courseName << std::endl;
+    bool b_found = false;
+    for (size_t u32_i = 0U; u32_i < courses.getSize(); ++u32_i) {
+        MyString c_courseName = courses.data[u32_i].key;
+        Course* p_course = CourseManagementSystem::findCourseByName(c_courseName);
+        if (p_course != nullptr) {
+            Map<MyString, Map<size_t, MyString>> c_assignments = p_course->getAssignments();
+            if (c_assignments.contains(c_assignmentName)) {
+                Map<size_t, MyString>& studentGrades = c_assignments[c_assignmentName];
+                if (studentGrades.contains(getId())) {
+                    MyString c_submission = studentGrades[getId()];
+                    std::cout << "Course: " << c_courseName.c_str() << " Assignment: " << c_assignmentName.c_str() << " Submission: " << c_submission.c_str() << std::endl;
+                    b_found = true;
+                }
+            }
+        }
     }
+    if (!b_found)
+        std::cout << "No submission found for assignment " << c_assignmentName.c_str() << std::endl;
 }
 
-void Student::viewGrades() const {
+void Student::viewGrades() const
+{
     std::cout << "--- " << getFirstName().c_str() << "'s Grades ---" << std::endl;
     if (courses.getSize() == 0U) {
         std::cout << "No courses enrolled." << std::endl;
         return;
     }
-    for (size_t u32_idx = 0U; u32_idx < courses.getSize(); ++u32_idx) {
-        std::cout << "Course: " << courses.data[u32_idx].key.c_str() << std::endl;
-        if (courses.data[u32_idx].value.isEmpty()) {
-            std::cout << "  No assignments/grades yet." << std::endl;
-        }
-        else {
-            for (size_t u32_j = 0U; u32_j < courses.data[u32_idx].value.getSize(); ++u32_j) {
-                std::cout << "    - " << courses.data[u32_idx].value[u32_j].c_str() << std::endl;
+    bool b_hasGrades = false;
+    for (size_t u32_i = 0U; u32_i < courses.getSize(); ++u32_i) {
+        MyString c_courseName = courses.data[u32_i].key;
+        Course* p_course = CourseManagementSystem::findCourseByName(c_courseName);
+        if (p_course != nullptr) {
+            Map<MyString, Map<size_t, MyString>> c_assignments = p_course->getAssignments();
+            for (size_t u32_j = 0U; u32_j < c_assignments.getSize(); ++u32_j) {
+                MyString c_assignmentName = c_assignments.data[u32_j].key;
+                Map<size_t, MyString>& grades = c_assignments.data[u32_j].value;
+                if (grades.contains(getId())) {
+                    MyString c_grade = grades[getId()];
+                    std::cout << c_courseName.c_str() << " | " << c_assignmentName.c_str() << " | " << c_grade.c_str() << std::endl;
+                    b_hasGrades = true;
+                }
             }
         }
     }
-    std::cout << "-----------------------" << std::endl;
-}
-
-void Student::changePassword(MyString oldPassm, MyString newPass)
-{
-    if (oldPassm == getPassword())
-    {
-        setPassword(newPass);
+    if (!b_hasGrades) {
+        std::cout << "No grades recorded yet." << std::endl;
     }
 }
 
-MyString Student::serialize() const {
-    MyString serialized_data = User::serialize();
-    return serialized_data;
+void Student::changePassword(MyString c_oldPassm, MyString c_newPass) {
+    if (c_oldPassm == getPassword())
+        setPassword(c_newPass);
 }
 
-void Student::sendMessage(size_t u32recipientId, const MyString& c_message) {
-    User::sendMessage(u32recipientId,c_message);
+MyString Student::serialize() const {
+    MyString c_serialized_data = User::serialize();
+    return c_serialized_data;
+}
+
+void Student::sendMessage(size_t u32_recipientId, const MyString& c_message) {
+    User::sendMessage(u32_recipientId, c_message);
 }
 
 void Student::viewMailbox() const {
     User::viewMailbox();
 }
+
+void Student::clearMailbox() {
+    inbox.clear();
+}
+
